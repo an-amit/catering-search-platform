@@ -16,15 +16,12 @@ export default function CatererCard({ caterer }: CatererCardProps) {
             <p className="mt-1 text-sm text-slate-500">{caterer.location}</p>
           </div>
           <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">
-            ${caterer.pricePerPlate.toFixed(2)} / plate
+            ₹{caterer.pricePerPlate.toFixed(2)} / plate
           </span>
         </div>
 
-        <p className="text-sm leading-6 text-slate-600">
-          {caterer.description ?? "Trusted catering services for every event."}
-        </p>
-
         <div className="flex flex-wrap gap-2">
+          <h2 className="text-lg font-medium text-slate-900">Cuisines</h2>
           {caterer.cuisines.map((item) => (
             <span
               key={item}

@@ -1,8 +1,15 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
-export async function fetchCaterers() {
+export async function fetchCaterers(search?: string) {
   try {
-    const response = await fetch(`${BASE_URL}/api/caterers`, {
+    const params = new URLSearchParams();
+
+    if (search) {
+      params.set("search", search);
+    }
+
+    const url = `${BASE_URL}/api/caterers${params.toString() ? `?${params.toString()}` : ""}`;
+    const response = await fetch(url, {
       headers: {
         Accept: "application/json",
       },

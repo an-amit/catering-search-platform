@@ -7,49 +7,64 @@ import CatererCard from "@/components/CatererCard";
 
 export default function CaterersPage() {
   const [caterers, setCaterers] = useState<Caterer[]>([]);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function loadCaterers() {
-      try {
-        setLoading(true);
-        setError(null);
+    const timer = window.setTimeout(() => {
+      async function loadCaterers() {
+        try {
+          setLoading(true);
+          setError(null);
 
-        const response = await fetchCaterers();
-        const result = response as CatererListResponse;
+          const response = await fetchCaterers(search.trim());
+          const result = response as CatererListResponse;
 
-        if (!result || !result.success) {
-          throw new Error(
-            (response as { message?: string }).message || "Failed to load caterers."
+          if (!result || !result.success) {
+            throw new Error(
+              (response as { message?: string }).message ||
+                "Failed to load caterers.",
+            );
+          }
+
+          setCaterers(result.data ?? []);
+        } catch (err) {
+          setError(
+            err instanceof Error ? err.message : "Unable to fetch caterers.",
           );
+        } finally {
+          setLoading(false);
         }
-
-        setCaterers(result.data ?? []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Unable to fetch caterers.");
-      } finally {
-        setLoading(false);
       }
-    }
 
-    loadCaterers();
-  }, []);
+      loadCaterers();
+    }, 300);
+
+    return () => window.clearTimeout(timer);
+  }, [search]);
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-10 text-slate-900 sm:px-8">
       <section className="mx-auto max-w-7xl">
         <div className="mb-10 rounded-3xl bg-white p-8 shadow-sm">
           <p className="text-sm uppercase tracking-[0.3em] text-slate-500">
-            Catering Marketplace
+            Search for Catering Services
           </p>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-900">
-            Discover local caterers near you
-          </h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
-            Browse trusted catering services with flexible pricing, cuisine styles,
-            and customer ratings to help you plan your next event.
-          </p>
+          <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-center">
+            <label htmlFor="search" className="sr-only">
+              Search caterers
+            </label>
+            <input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              type="text"
+              name="search"
+              id="search"
+              placeholder="Search for caterers..."
+              className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+            />
+          </div>
         </div>
 
         {loading ? (
