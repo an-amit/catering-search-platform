@@ -1,0 +1,42 @@
+[
+  {
+    "id": "1",
+    "name": "Spice Route Caterers",
+    "location": "Mumbai",
+    "pricePerPlate": 450,
+    "cuisines": ["North Indian", "Mughlai"],
+    "rating": 4.5
+  },
+  {
+    "id": "2",
+    "name": "Green Leaf Catering",
+    "location": "Pune",
+    "pricePerPlate": 350,
+    "cuisines": ["South Indian", "Vegan"],
+    "rating": 4.2
+  },
+  {
+    "id": "3",
+    "name": "Royal Feast",
+    "location": "Delhi",
+    "pricePerPlate": 800,
+    "cuisines": ["Mughlai", "Continental"],
+    "rating": 4.8
+  },
+  {
+    "id": "4",
+    "name": "Coastal Bites",
+    "location": "Goa",
+    "pricePerPlate": 600,
+    "cuisines": ["Goan", "Seafood"],
+    "rating": 4.6
+  },
+  {
+    "id": "5",
+    "name": "Urban Tandoor",
+    "location": "Bengaluru",
+    "pricePerPlate": 400,
+    "cuisines": ["North Indian", "Chinese"],
+    "rating": 4.0
+  }
+]

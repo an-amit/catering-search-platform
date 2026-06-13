@@ -1,0 +1,46 @@
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+export async function fetchCaterers() {
+  try {
+    const response = await fetch(`${BASE_URL}/api/caterers`, {
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      throw new Error(`Fetch failed: ${response.status} ${errorBody}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching caterers:", error);
+    throw error;
+  }
+}
+
+export async function createCaterer(catererData: unknown) {
+  try {
+    const response = await fetch(`${BASE_URL}/api/caterers`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(catererData),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      throw new Error(`Create failed: ${response.status} ${errorBody}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error creating caterer:", error);
+    throw error;
+  }
+}
