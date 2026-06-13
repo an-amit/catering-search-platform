@@ -31,7 +31,13 @@ async function getAllCaterers(req, res) {
 
     console.log("getAllCaterers filter:", filter);
 
-    const caterers = await Caterer.find(filter).lean();
+    const rawCaterers = await Caterer.find(filter).lean();
+
+    const caterers = rawCaterers.map((c) => ({
+      ...c,
+      id: c._id.toString(),
+    }));
+
     return res.json({ success: true, count: caterers.length, data: caterers });
   } catch (error) {
     console.error("getAllCaterers error:", error);
@@ -53,6 +59,10 @@ async function getCatererById(req, res) {
         .status(404)
         .json({ success: false, message: "Caterer not found" });
     }
+
+    caterer.id = caterer._id.toString();
+    delete caterer._id;
+    delete caterer.__v;
 
     return res.json({ success: true, data: caterer });
   } catch (error) {

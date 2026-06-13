@@ -20,16 +20,20 @@ export default function CatererCard({ caterer }: CatererCardProps) {
           </span>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <h2 className="text-lg font-medium text-slate-900">Cuisines</h2>
-          {caterer.cuisines.map((item) => (
-            <span
-              key={item}
-              className="bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700"
-            >
-              {item}
-            </span>
-          ))}
+        <div>
+          <h3 className="text-sm font-semibold text-slate-900 mb-2">
+            Cuisines
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {caterer.cuisines.map((item) => (
+              <span
+                key={item}
+                className="bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700"
+              >
+                {item}
+              </span>
+            ))}
+          </div>
         </div>
 
         <div className="flex items-center justify-between bg-slate-50 px-4 py-3 text-sm text-slate-700">
