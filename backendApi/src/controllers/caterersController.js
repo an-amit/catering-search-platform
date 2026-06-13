@@ -1,81 +1,93 @@
-const fs = require("fs");
-const path = require("path");
-
-const DATA_FILE = path.join(__dirname, "../data/caterers.json");
-
-function readCaterersData() {
-  try {
-    const data = fs.readFileSync(DATA_FILE, "utf-8");
-    return JSON.parse(data);
-  } catch (err) {
-    return [];
-  }
-}
-
-function writeCaterersData(caterers) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(caterers, null, 2));
-}
+const Caterer = require("../models/Caterer");
 
 // GET /api/caterers
 // Supports optional query parameters: search, minPrice, maxPrice, location
-function getAllCaterers(req, res) {
-  let caterers = readCaterersData();
-  const { search, minPrice, maxPrice, location } = req.query;
+async function getAllCaterers(req, res) {
+  try {
+    const { search, minPrice, maxPrice, location } = req.query;
+    const filter = {};
 
-  if (search) {
-    const term = search.toLowerCase();
-    caterers = caterers.filter((c) => c.name.toLowerCase().includes(term));
+    if (search) {
+      filter.name = { $regex: search, $options: "i" };
+    }
+
+    if (location) {
+      filter.location = { $regex: location, $options: "i" };
+    }
+
+    const priceFilter = {};
+
+    if (minPrice !== undefined && minPrice !== "") {
+      priceFilter.$gte = parseFloat(minPrice);
+    }
+
+    if (maxPrice !== undefined && maxPrice !== "") {
+      priceFilter.$lte = parseFloat(maxPrice);
+    }
+
+    if (Object.keys(priceFilter).length > 0) {
+      filter.pricePerPlate = priceFilter;
+    }
+
+    console.log("getAllCaterers filter:", filter);
+
+    const caterers = await Caterer.find(filter).lean();
+    return res.json({ success: true, count: caterers.length, data: caterers });
+  } catch (error) {
+    console.error("getAllCaterers error:", error);
+    return res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : "Server error",
+    });
   }
-
-  if (minPrice) {
-    caterers = caterers.filter((c) => c.pricePerPlate >= parseFloat(minPrice));
-  }
-
-  if (maxPrice) {
-    caterers = caterers.filter((c) => c.pricePerPlate <= parseFloat(maxPrice));
-  }
-
-  if (location) {
-    const loc = location.toLowerCase();
-    caterers = caterers.filter((c) => c.location.toLowerCase().includes(loc));
-  }
-
-  res.json({ success: true, count: caterers.length, data: caterers });
 }
 
 // GET /api/caterers/:id
-function getCatererById(req, res) {
-  let catererId = req.params.id;
+async function getCatererById(req, res) {
+  try {
+    const { id } = req.params;
 
-  let caterers = readCaterersData();
-  let caterer = caterers.find((c) => c.id === catererId);
+    const caterer = await Caterer.findById(id).lean();
+    if (!caterer) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Caterer not found" });
+    }
 
-  if (!caterer) {
-    return res
-      .status(404)
-      .json({ success: false, message: "Caterer not found" });
+    return res.json({ success: true, data: caterer });
+  } catch (error) {
+    console.error("getCatererById error:", error);
+    return res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : "Server error",
+    });
   }
-
-  res.json({ success: true, data: caterer });
 }
 
 // POST /api/caterers
-function createCaterer(req, res) {
-  const { name, location, pricePerPlate, cuisines, rating } = req.body;
+async function createCaterer(req, res) {
+  try {
+    const { name, location, pricePerPlate, cuisines, rating } = req.body;
 
-  let caterers = readCaterersData();
-  let newCaterer = {
-    id: Date.now().toString(),
-    name,
-    location,
-    pricePerPlate,
-    cuisines: cuisines.map((c) => c.trim()),
-    rating,
-  };
+    const newCaterer = await Caterer.create({
+      name,
+      location,
+      pricePerPlate,
+      cuisines: Array.isArray(cuisines)
+        ? cuisines.map((c) => String(c).trim())
+        : [],
+      rating,
+    });
 
-  caterers.push(newCaterer);
-  writeCaterersData(caterers);
-  res.json({ success: true, data: newCaterer });
+    return res.status(201).json({ success: true, data: newCaterer });
+  } catch (error) {
+    console.error("createCaterer error:", error);
+    return res.status(400).json({
+      success: false,
+      message:
+        error instanceof Error ? error.message : "Unable to create caterer",
+    });
+  }
 }
 
 module.exports = {
