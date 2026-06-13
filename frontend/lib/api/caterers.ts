@@ -1,11 +1,23 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
-export async function fetchCaterers(search?: string) {
+export async function fetchCaterers(
+  search?: string,
+  minPrice?: string | number,
+  maxPrice?: string | number,
+) {
   try {
     const params = new URLSearchParams();
 
     if (search) {
       params.set("search", search);
+    }
+
+    if (minPrice !== undefined && minPrice !== "") {
+      params.set("minPrice", String(minPrice));
+    }
+
+    if (maxPrice !== undefined && maxPrice !== "") {
+      params.set("maxPrice", String(maxPrice));
     }
 
     const url = `${BASE_URL}/api/caterers${params.toString() ? `?${params.toString()}` : ""}`;
