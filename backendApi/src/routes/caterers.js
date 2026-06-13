@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
+const validateCaterer = require("../middleware/validateCaterer");
 const {
   getAllCaterers,
   getCatererById,
@@ -9,5 +10,5 @@ const {
 
 router.get("/", getAllCaterers);
 router.get("/:id", getCatererById);
-router.post("/", createCaterer);
+router.post("/", validateCaterer, createCaterer);
 module.exports = router;
